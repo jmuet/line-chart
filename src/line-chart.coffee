@@ -11,7 +11,7 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
     dispatch = _u.getEventDispatcher()
     id = _u.uuid()
 
-    oneshot = attrs.oneshot || false
+    oneshot = attrs.ngOneshotoptions || false
     
     # Hacky hack so the chart doesn't grow in height when resizing...
     element[0].style['font-size'] = 0
@@ -21,6 +21,7 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
 
       return
 
+    scope.oneshotoptions = JSON.parse(scope.ngOneshotoptions)
     isUpdatingOptions = false
     initialHandlers =
       onSeriesVisibilityChange: ({series, index, newVisibility}) ->
@@ -28,7 +29,7 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
         scope.$apply()
  
     scope.update = () ->
-      options = _u.sanitizeOptions((if oneshot then JSON.parse(scope.oneshot) else scope.options), attrs.mode)
+      options = _u.sanitizeOptions((if oneshot then scope.oneshotoptions else scope.options), attrs.mode)
       handlers = angular.extend(initialHandlers, _u.getTooltipHandlers(options))
       dataPerSeries = _u.getDataPerSeries(scope.data, options)
       dimensions = _u.getDimensions(options, element, attrs)
@@ -127,7 +128,7 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
     scope:
       data: '=',
       options: '=',
-      oneshot: '@',
+      ngOneshotoptions: '@',
       # Deprecated: this will be removed in 2.x
       oldclick: '=click',  oldhover: '=hover',  oldfocus: '=focus',
       # Events

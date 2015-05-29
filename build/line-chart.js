@@ -1,6 +1,6 @@
 
 /*
-line-chart - v1.0 - 29 May 2015
+line-chart - v1.1.10 - 29 May 2015
 https://github.com/n3-charts/line-chart
 Copyright (c) 2015 n3-charts
  */
@@ -24,11 +24,12 @@ directive('linechart', [
       _u = n3utils;
       dispatch = _u.getEventDispatcher();
       id = _u.uuid();
-      oneshot = attrs.oneshot || false;
+      oneshot = attrs.ngOneshotoptions || false;
       element[0].style['font-size'] = 0;
       scope.redraw = function() {
         scope.update();
       };
+      scope.oneshotoptions = JSON.parse(scope.ngOneshotoptions);
       isUpdatingOptions = false;
       initialHandlers = {
         onSeriesVisibilityChange: function(_arg) {
@@ -40,7 +41,7 @@ directive('linechart', [
       };
       scope.update = function() {
         var axes, columnWidth, dataPerSeries, dimensions, fn, handlers, isThumbnail, options, svg;
-        options = _u.sanitizeOptions((oneshot ? JSON.parse(scope.oneshot) : scope.options), attrs.mode);
+        options = _u.sanitizeOptions((oneshot ? scope.oneshotoptions : scope.options), attrs.mode);
         handlers = angular.extend(initialHandlers, _u.getTooltipHandlers(options));
         dataPerSeries = _u.getDataPerSeries(scope.data, options);
         dimensions = _u.getDimensions(options, element, attrs);
@@ -127,7 +128,7 @@ directive('linechart', [
       scope: {
         data: '=',
         options: '=',
-        oneshot: '@',
+        ngOneshotoptions: '@',
         oldclick: '=click',
         oldhover: '=hover',
         oldfocus: '=focus',
