@@ -1,6 +1,6 @@
 
 /*
-line-chart - v1.1.9 - 27 May 2015
+line-chart - v1.1.9 - 29 May 2015
 https://github.com/n3-charts/line-chart
 Copyright (c) 2015 n3-charts
  */
@@ -20,10 +20,11 @@ directive('linechart', [
   'n3utils', '$window', '$timeout', function(n3utils, $window, $timeout) {
     var link;
     link = function(scope, element, attrs, ctrl) {
-      var dispatch, id, initialHandlers, isUpdatingOptions, promise, updateEvents, window_resize, _u;
+      var dispatch, id, initialHandlers, isUpdatingOptions, oneshot, promise, updateEvents, window_resize, _u;
       _u = n3utils;
       dispatch = _u.getEventDispatcher();
       id = _u.uuid();
+      oneshot = attrs.oneshot || false;
       element[0].style['font-size'] = 0;
       scope.redraw = function() {
         scope.update();
@@ -39,7 +40,7 @@ directive('linechart', [
       };
       scope.update = function() {
         var axes, columnWidth, dataPerSeries, dimensions, fn, handlers, isThumbnail, options, svg;
-        options = _u.sanitizeOptions(scope.options, attrs.mode);
+        options = _u.sanitizeOptions((oneshot ? JSON.parse(scope.oneshot) : scope.options), attrs.mode);
         handlers = angular.extend(initialHandlers, _u.getTooltipHandlers(options));
         dataPerSeries = _u.getDataPerSeries(scope.data, options);
         dimensions = _u.getDimensions(options, element, attrs);
@@ -114,7 +115,9 @@ directive('linechart', [
       };
       $window.addEventListener('resize', window_resize);
       scope.$watch('data', scope.redraw, true);
-      scope.$watch('options', scope.redraw, true);
+      if (!oneshot) {
+        scope.$watch('options', scope.redraw, true);
+      }
       scope.$watchCollection('[click, hover, focus, toggle]', updateEvents);
       scope.$watchCollection('[oldclick, oldhover, oldfocus]', updateEvents);
     };
@@ -124,6 +127,7 @@ directive('linechart', [
       scope: {
         data: '=',
         options: '=',
+        oneshot: '@',
         oldclick: '=click',
         oldhover: '=hover',
         oldfocus: '=focus',

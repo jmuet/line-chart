@@ -11,6 +11,8 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
     dispatch = _u.getEventDispatcher()
     id = _u.uuid()
 
+    oneshot = attrs.oneshot || false
+    
     # Hacky hack so the chart doesn't grow in height when resizing...
     element[0].style['font-size'] = 0
 
@@ -26,7 +28,7 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
         scope.$apply()
 
     scope.update = () ->
-      options = _u.sanitizeOptions(scope.options, attrs.mode)
+      options = _u.sanitizeOptions((if oneshot then JSON.parse(scope.oneshot) else scope.options), attrs.mode)
       handlers = angular.extend(initialHandlers, _u.getTooltipHandlers(options))
       dataPerSeries = _u.getDataPerSeries(scope.data, options)
       dimensions = _u.getDimensions(options, element, attrs)
@@ -110,19 +112,22 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
     $window.addEventListener('resize', window_resize)
 
     scope.$watch('data', scope.redraw, true)
-    scope.$watch('options', scope.redraw , true)
+    if (!oneshot)
+        scope.$watch('options', scope.redraw , true)
     scope.$watchCollection('[click, hover, focus, toggle]', updateEvents)
 
     # Deprecated: this will be removed in 2.x
     scope.$watchCollection('[oldclick, oldhover, oldfocus]', updateEvents)
 
     return
-
+  
   return {
     replace: true
     restrict: 'E'
     scope:
-      data: '=', options: '=',
+      data: '=',
+      options: '=',
+      oneshot: '@',
       # Deprecated: this will be removed in 2.x
       oldclick: '=click',  oldhover: '=hover',  oldfocus: '=focus',
       # Events
@@ -130,4 +135,5 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
     template: '<div></div>'
     link: link
   }
+          
 ])
