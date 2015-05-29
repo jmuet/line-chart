@@ -26,7 +26,7 @@ directive('linechart', ['n3utils', '$window', '$timeout', (n3utils, $window, $ti
       onSeriesVisibilityChange: ({series, index, newVisibility}) ->
         scope.options.series[index].visible = newVisibility
         scope.$apply()
-
+ 
     scope.update = () ->
       options = _u.sanitizeOptions((if oneshot then JSON.parse(scope.oneshot) else scope.options), attrs.mode)
       handlers = angular.extend(initialHandlers, _u.getTooltipHandlers(options))
